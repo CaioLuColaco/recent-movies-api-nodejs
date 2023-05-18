@@ -1,9 +1,8 @@
-import User from "../models/user";
+import {User} from "../models/user.js";
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 
-module.exports = {
-    async create(req, res) {
+export async function createUser(req, res) {
         try {
             const {email, password} = req.body
 
@@ -33,56 +32,55 @@ module.exports = {
             return res.status(400).json({status: 400, message: error.message})
         }
          
-    },
-    
-    async login(req, res) {
-        try {
-            const {email, password} = req.body
+    }
 
-            // validations
-            if(email == ""){
-                return res.status(400).json({status: 400, message: "Preencher Email!"})
-            }
-            if(password.length < 4){
-                return res.status(400).json({status: 400, message: "A senha deve ter pelo menos 4 caracteres!"})
-            }
+export async function loginUser(req, res) {
+    try {
+        const {email, password} = req.body
 
-            const findUser = await User.findOne({email: email})
-
-            if(!findUser){
-                return res.status(400).json({status: 400, message: "Usuário não cadastrado!"})
-            }
-
-            // Validate the Password
-            var validation = false
-            if(email == findUser.email){
-                validation = bcrypt.compareSync(password, findUser.password)
-            }
-
-            // Return token
-            if(validation == true){
-                const secretKey = process.env.AUTH_SECRET_KEY
-                try {
-                    const token = jwt.sign({
-                        id: findUser.id,
-                        name: findUser.name,
-                        role: findUser.role
-                    },
-                    secretKey
-                    )
-
-                    return res.status(200).json({message: "Usuário autenticado com sucesso! Colocque o token de liberação nas suas requisições", token: `Bearer ${token}`})
-
-                } catch (error) {
-                    console.log(error)
-                }
-
-            }else{
-                return res.status(422).json({status: 422, message: "Senha invalida!"})
-            }
-
-        } catch (error) {
-            return res.status(400).json({status: 400, message: error.message})
+        // validations
+        if(email == ""){
+            return res.status(400).json({status: 400, message: "Preencher Email!"})
         }
+        if(password.length < 4){
+            return res.status(400).json({status: 400, message: "A senha deve ter pelo menos 4 caracteres!"})
+        }
+
+        const findUser = await User.findOne({email: email})
+
+        if(!findUser){
+            return res.status(400).json({status: 400, message: "Usuário não cadastrado!"})
+        }
+
+        // Validate the Password
+        var validation = false
+        if(email == findUser.email){
+            validation = bcrypt.compareSync(password, findUser.password)
+        }
+
+        // Return token
+        if(validation == true){
+            const secretKey = process.env.AUTH_SECRET_KEY
+            try {
+                const token = jwt.sign({
+                    id: findUser.id,
+                    name: findUser.name,
+                    role: findUser.role
+                },
+                secretKey
+                )
+
+                return res.status(200).json({message: "Usuário autenticado com sucesso! Colocque o token de liberação nas suas requisições", token: `Bearer ${token}`})
+
+            } catch (error) {
+                console.log(error)
+            }
+
+        }else{
+            return res.status(422).json({status: 422, message: "Senha invalida!"})
+        }
+
+    } catch (error) {
+        return res.status(400).json({status: 400, message: error.message})
     }
 }
