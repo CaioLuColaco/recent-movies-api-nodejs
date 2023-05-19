@@ -5,13 +5,16 @@ import dotenv from "dotenv"
 import {initMongoose} from "./src/config/database.js";
 import routes from "./src/routes.js";
 
+import swaggerUi from 'swagger-ui-express'
+import swaggerFile from './swagger_output.json' assert { type: "json" };
+
 const app = express()
 
 dotenv.config()
 
 app.use(cors())
 app.use(express.json())
-app.use(routes)
+app.use(routes, swaggerUi.serve, swaggerUi.setup(swaggerFile))
 
 initMongoose()
 
