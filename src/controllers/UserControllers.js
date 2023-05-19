@@ -73,7 +73,7 @@ export async function loginUser(req, res) {
                 return res.status(200).json({message: "Usuário autenticado com sucesso! Colocque o token de liberação nas suas requisições", token: `Bearer ${token}`})
 
             } catch (error) {
-                console.log(error)
+                throw new Error(error)
             }
 
         }else{

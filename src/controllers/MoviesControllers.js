@@ -49,7 +49,6 @@ export async function getOneMovie(req, res){
 
 export async function getAllLikedMovies(req, res){
     try {
-        console.log("entoru")
         const result = await Movies.find({})
 
         return res.status(200).json(result)
